@@ -10,6 +10,8 @@ class Figure:
 #     $env:Path = "C:\Users\aline\.local\bin;$env:Path"   
 #     $env:Path = "C:\Users\aline\.local\bin;$env:Path"   
 class Pawn(Figure):
+    def letter(self):
+        return self.color + 'P'
    
     # Parent class attributes and methods
     def tt(self):
@@ -22,6 +24,8 @@ class Pawn(Figure):
 #     $env:Path = "C:\Users\aline\.local\bin;$env:Path" 
 
 class King(Figure):
+    def letter(self):
+        return self.color + 'K'
 
     def get_moves():
         return [
@@ -35,6 +39,10 @@ class King(Figure):
             [-1, 1]
         ]
 class Horse(Figure):
+
+    def letter(self):
+        return self.color + 'H'
+
     def can_overstep():
         return true
 
@@ -51,6 +59,8 @@ class Horse(Figure):
         ]
 
 class Rook(Figure):
+    def letter(self):
+        return self.color + 'R'
 
     def get_moves():
         return [
@@ -88,6 +98,8 @@ class Rook(Figure):
         ]
 
 class Bishop(Figure):
+    def letter(self):
+        return self.color + 'B'
 
     def get_moves():
         moves = []
@@ -101,6 +113,9 @@ class Bishop(Figure):
 
 class Queen(Figure):
 
+    def letter(self):
+        return self.color + 'Q'
+
     def get_moves():
         moves = []
         moves.append(Bishop.get_moves())
@@ -108,16 +123,11 @@ class Queen(Figure):
 
         return moves
         
-class Tower(Figure):
-   
-    # Parent class attributes and methods
-    def tt(self):
-        print(self.color)
 
 class ChessBoard:
     def __init__(self):
         self.board = [
-            [Rook("B"), Horse("B"), Bishop("B"), King("B")4, Queen("B"), Bishop("B"), Horse("B"), Rook("B")],
+            [Rook("B"), Horse("B"), Bishop("B"), King("B"), Queen("B"), Bishop("B"), Horse("B"), Rook("B")],
             [Pawn("B"), Pawn("B"), Pawn("B"), Pawn("B"), Pawn("B"), Pawn("B"), Pawn("B"), Pawn("B")],
             [None, None, None, None, None, None, None, None],
             [None, None, None, None, None, None, None, None],
@@ -127,10 +137,22 @@ class ChessBoard:
             [Rook("W"), Horse("W"), Bishop("W"), Queen("W"), King("W"), Bishop("W"), Horse("W"), Rook("W")],
         ]
 
+    def render(self):
+        print("   a  b  c  d  e  f  g  h\n")
+        for (i, r) in enumerate(self.board):
+            print(i + 1, end="  ")
+            for f in r:
+                if f == None:
+                    print(end=" ")
+                else:
+                    print(f.letter(), end=" ")
+            print()
+
+        print("\n   a  b  c  d  e  f  g  h")
+
+
+
 board = ChessBoard()
-print(board.board)
-horse = Horse("White")
-bi = Bishop("White")
-print(Queen.get_moves())
+board.render()
 
  
