@@ -1,4 +1,6 @@
-#     $env:Path = "C:\Users\aline\.local\bin;$env:Path"   
+#     $env:Path = "C:\Users\aline\.local\bin;$env:Path"  
+
+import itertools
 class Figure:
     # Parent class attributes and methods
     def __init__(self, color):
@@ -17,6 +19,7 @@ class Pawn(Figure):
     def tt(self):
         print(self.color)
 
+    @staticmethod
     def get_moves():
         return [
             [1, 0]
@@ -26,7 +29,7 @@ class Pawn(Figure):
 class King(Figure):
     def letter(self):
         return self.color + 'K'
-
+    @staticmethod
     def get_moves():
         return [
             [1, -1],
@@ -45,8 +48,8 @@ class Horse(Figure):
 
     def can_overstep():
         return true
-
-    def get_moves(self):
+    @staticmethod
+    def get_moves():
         return [
             [1, 2],
             [2, 1],
@@ -61,7 +64,7 @@ class Horse(Figure):
 class Rook(Figure):
     def letter(self):
         return self.color + 'R'
-
+    @staticmethod
     def get_moves():
         return [
             [0, 1],
@@ -100,7 +103,7 @@ class Rook(Figure):
 class Bishop(Figure):
     def letter(self):
         return self.color + 'B'
-
+    @staticmethod
     def get_moves():
         moves = []
         for i in range(1, 8):
@@ -116,12 +119,9 @@ class Queen(Figure):
     def letter(self):
         return self.color + 'Q'
 
-    def get_moves():
-        moves = []
-        moves.append(Bishop.get_moves())
-        moves.append(Rook.get_moves())
-
-        return moves
+    @staticmethod
+    def get_moves():        
+        return Bishop.get_moves() + Rook.get_moves()
         
 
 class ChessBoard:
@@ -138,14 +138,35 @@ class ChessBoard:
         ]
 
     def step(self, is_White, src, dst):
-        f = self.board[int(src[0]) - 1][ord(src[1]) - 97]
+
+        sx = int(src[0]) - 1
+        sy = ord(src[1]) - 97
+
+        dx = int(dst[0]) - 1
+        dy = ord(dst[1]) - 97
+        
+        f = self.board[sx][sy]
 
         if (f.color == "B" and is_White) or (f.color == "W" and not is_White):
             print("You are not using your figure")
             return False
 
-        self.board[int(dst[0]) - 1][ord(dst[1]) - 97] = self.board[int(src[0]) - 1][ord(src[1]) - 97]
-        self.board[int(src[0]) - 1][ord(src[1]) - 97] = None
+        is_legal = False
+        for move in f.get_moves():
+            print(sx - dx)
+            print(sy - dy)
+            if f.color == "B":
+                move[0] = - move[0]
+
+            if move[0] == sx - dx and move[1] == sy - dy:
+                is_legal = True
+
+        print(is_legal)
+        if not is_legal:
+            return False
+
+        self.board[dx][dy] = self.board[sx][sy]
+        self.board[sx][sy] = None
 
         return True
 
