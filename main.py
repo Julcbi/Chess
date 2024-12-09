@@ -224,6 +224,15 @@ class ChessBoard:
         if not is_legal:
             return False
 
+        target = self.board[dx][dy]
+        if isinstance(target, King):
+            print("Checkmate! The King has been captured. Game over.")
+            self.board[dx][dy] = f  
+            self.board[sx][sy] = None 
+            self.render()
+            exit(0)
+
+
         self.board[dx][dy] = self.board[sx][sy]
         self.board[sx][sy] = None
 
@@ -258,7 +267,7 @@ while True:
         print("Black turn")
     src = input ("src: ")
     dst = input ("dst: ")
-
+    
     while not board.step(is_White, src, dst):
         print("Wrong input, try again")
         src = input ("src: ")
