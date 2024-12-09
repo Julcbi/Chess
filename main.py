@@ -8,7 +8,7 @@ class Figure:
 
     
     def can_overstep(self):
-        return false
+        return False
 
 #     $env:Path = "C:\Users\aline\.local\bin;$env:Path"   
 #     $env:Path = "C:\Users\aline\.local\bin;$env:Path"   
@@ -17,17 +17,19 @@ class Pawn(Figure):
         return self.color + 'P'
    
     # Parent class attributes and methods
-    def tt(self):
-        print(self.color)
+    #def tt(self):
+    #    print(self.color)
 
     @staticmethod
     def get_moves():
         return [
             [1, 0],
-            [2, 0]
+            [2, 0],
+            [1, -1],
+            [1, 1] 
         ]
 
-
+   
 #     $env:Path = "C:\Users\aline\.local\bin;$env:Path" 
 
 class King(Figure):
@@ -50,8 +52,10 @@ class Horse(Figure):
     def letter(self):
         return self.color + 'H'
 
-    def can_overstep():
-        return true
+    def can_overstep(self):
+        return True
+
+
     @staticmethod
     def get_moves():
         return [
@@ -117,6 +121,7 @@ class Bishop(Figure):
             moves.append([-i, -i])
 
         return moves
+        
 
 class Queen(Figure):
 
@@ -146,59 +151,64 @@ class ChessBoard:
         self.is_white_first_step = True
 
     def step(self, is_White, src, dst):
-
         sx = int(src[0]) - 1
         sy = ord(src[1]) - 97
 
         dx = int(dst[0]) - 1
         dy = ord(dst[1]) - 97
 
-        if dx > 7 or dx < 0 or dy > 7  or dy < 0:
-            print ("out of range")
+        if dx > 7 or dx < 0 or dy > 7 or dy < 0:
+            print("out of range")
             return False
 
         f = self.board[sx][sy]
 
-        if (f.color == "B" and is_White) or (f.color == "W" and not is_White):
+        if not f or (f.color == "B" and is_White) or (f.color == "W" and not is_White):
             print("You are not using your figure")
             return False
 
         is_legal = False
         for move in f.get_moves():
             if not self.is_black_first_step and f.letter() == "BP" and move[0] == 2:
-                break;
+                continue
 
             if not self.is_white_first_step and f.letter() == "WP" and move[0] == 2:
-                break;
+                continue
 
             if f.color == "B":
-                move[0] = - move[0]
+                move[0] = -move[0]
 
             if move[0] == sx - dx and move[1] == sy - dy:
+                if abs(move[1]) == 1 and isinstance(f, Pawn):
+                    target = self.board[dx][dy]
+                    if target is None or target.color == f.color:
+                        continue
                 is_legal = True
+                break
+
         if f.letter() != "WH" and f.letter() != "BH":
             if sy == dy:
                 if sx > dx:
                     for x in range(sx, dx, -1)[1:]:
-                        if self.board[x][sy] != None:
-                            is_legal = False       
+                        if self.board[x][sy] is not None:
+                            is_legal = False
                 else:
                     for x in range(sx, dx)[1:]:
-                        if self.board[x][sy] != None:
+                        if self.board[x][sy] is not None:
                             is_legal = False
-            
+
             if sx == dx:
                 if sy > dy:
                     for y in range(sy, dy, -1)[1:]:
-                        if self.board[sx][y] != None:
+                        if self.board[sx][y] is not None:
                             is_legal = False
                 else:
                     for y in range(sy, dy)[1:]:
-                        if self.board[sx][y] != None:
+                        if self.board[sx][y] is not None:
                             is_legal = False
 
-            signY = 1;
-            signX = 1;
+            signY = 1
+            signX = 1
 
             if sy > dy:
                 signY = -1
@@ -207,8 +217,8 @@ class ChessBoard:
 
             for y, x in zip(range(sy, dy, signY)[1:], range(sx, dx, signX)[1:]):
                 print(x, y)
-                if self.board[x][y] != None:
-                    is_legal = False 
+                if self.board[x][y] is not None:
+                    is_legal = False
 
         print(is_legal)
         if not is_legal:
@@ -223,6 +233,7 @@ class ChessBoard:
             self.is_black_first_step = False
 
         return True
+
 
     def render(self):
         print("   a  b  c  d  e  f  g  h\n")
