@@ -257,10 +257,90 @@ class ChessBoard:
             print()
         print("\n   a  b  c  d  e  f  g  h")
 
+
+    def is_king_in_check(self, is_white):
+        """Verifica se o rei está sob ataque direto."""
+        king_position = None
+        for x, row in enumerate(self.board):
+            for y, piece in enumerate(row):
+                if isinstance(piece, King) and piece.color == ("W" if is_white else "B"):
+                    king_position = (x, y)
+                    break
+            if king_position:
+                break
+
+        if king_position is None:
+            return False  # Rei não encontrado no tabuleiro
+
+        king_x, king_y = king_position
+
+        for x, row in enumerate(self.board):
+            for y, piece in enumerate(row):
+                if piece and piece.color != ("W" if is_white else "B"):
+                    for move in piece.get_moves():
+                        move_x, move_y = move
+                        if not piece.can_overstep():
+                            for step in range(1, 8):
+                                target_x = x + move_x * step
+                                target_y = y + move_y * step
+                                if 0 <= target_x < 8 and 0 <= target_y < 8:
+                                    if (target_x, target_y) == (king_x, king_y):
+                                        return True  # Rei está sob ataque
+                                    if self.board[target_x][target_y] is not None:
+                                        break
+                        else:
+                            target_x = x + move_x
+                            target_y = y + move_y
+                            if 0 <= target_x < 8 and 0 <= target_y < 8:
+                                if (target_x, target_y) == (king_x, king_y):
+                                    return True
+        return False
+
+    def can_defend_king(self, is_white):
+        """Verifica se há alguma peça que pode defender o rei."""
+        king_position = None
+        for x, row in enumerate(self.board):
+            for y, piece in enumerate(row):
+                if isinstance(piece, King) and piece.color == ("W" if is_white else "B"):
+                    king_position = (x, y)
+                    break
+            if king_position is None:
+                return False
+
+        king_x, king_y = king_position
+
+        for x, row in enumerate(self.board):
+            for y, piece in enumerate(row):
+                if piece and piece.color == ("W" if is_white else "B"):
+                    for move in piece.get_moves():
+                        target_x = x + move[0]
+                        target_y = y + move[1]
+                        if 0 <= target_x < 8 and 0 <= target_y < 8:
+                            original_piece = self.board[target_x][target_y]
+                            self.board[target_x][target_y] = piece
+                            self.board[x][y] = None
+
+                            if not self.is_king_in_check(is_white):
+                                # Restaura o estado original e retorna True
+                                self.board[x][y] = piece
+                                self.board[target_x][target_y] = original_piece
+                                return True
+
+                            # Restaura o estado original
+                            self.board[x][y] = piece
+                            self.board[target_x][target_y] = original_piece
+        return False
+
+
+
 board = ChessBoard()
 is_White = True
 while True:
     board.render()
+
+    if board.is_king_in_check(is_White) and board.can_defend_king(is_White):
+        print("Check!")
+
     if is_White: 
         print("White turn")
     else:
